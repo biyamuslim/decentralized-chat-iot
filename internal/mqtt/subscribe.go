@@ -1,14 +1,54 @@
 package mqtt
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/base64"
 	"fmt"
+	"os"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-func (c *Client) Subscribe(topic string) {
+// DecryptMessage decrypts the given message using AES decryption.
+func DecryptMessage(key, encryptedMessage string) (string, error) {
+	ciphertext, err := base64.URLEncoding.DecodeString(encryptedMessage)
+	if err != nil {
+		return "", err
+	}
+
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
+	}
+
+	if len(ciphertext) < aes.BlockSize {
+		return "", fmt.Errorf("ciphertext too short")
+	}
+
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(ciphertext, ciphertext)
+
+	return string(ciphertext), nil
+}
+
+func (c *Client) Subscribe(topic string, clientName string) {
+	encryptionKey := os.Getenv("ENCRYPTION_KEY")
+
 	token := c.mqttClient.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("Received message on topic '%s': %s\n", msg.Topic(), string(msg.Payload()))
+		encryptedMessage := string(msg.Payload())
+
+		// Decrypt the message
+		decryptedMessage, err := DecryptMessage(encryptionKey, encryptedMessage)
+		if err != nil {
+			fmt.Printf("Failed to decrypt message on topic '%s': %v\n", msg.Topic(), err)
+			return
+		}
+
+		fmt.Printf("Received message on topic '%s' from %s: %s\n", msg.Topic(), clientName, decryptedMessage)
 	})
 	token.Wait()
 	if token.Error() != nil {

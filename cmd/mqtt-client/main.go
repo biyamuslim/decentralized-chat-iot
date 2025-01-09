@@ -56,19 +56,21 @@ func main() {
 	}
 
 	// Initialize the MQTT client using ClientID
+	// I was using public broker but it was causing delay
+	// so "tcp://localhost:1883" can be replaced by "tcp://broker.hivemq.com:1883",
 	mqttClient := mqtt.NewClient("tcp://localhost:1883", strconv.FormatInt(client.ID, 10))
 
 	// Subscribe to a topic in a goroutine
-	go mqttClient.Subscribe("test/topic")
+	go mqttClient.Subscribe("test/topic", client.ClientName)
 
-	// Start input loop to send messages dynamically
+	// Input to deliver message
 	fmt.Println("Type your messages below. Press Ctrl+C to exit.")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		message := scanner.Text()
 
 		if message == "" {
-			continue // Skip empty messages
+			continue
 		}
 
 		// Publish and save the message using the client ID
