@@ -38,7 +38,7 @@ Follow the steps below to set up and run the decentralized chat system.
 
 Create a `.env` file in the root directory and add the following keys:
 ```env
-DATABASE_PATH=./app.db
+DATABASE_PATH=./YourDBName.db
 MIGRATION_PATH=./migrations
 ENCRYPTION_KEY="your-32-byte-secret-key-for-aes!"
 ```
