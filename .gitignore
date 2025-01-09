@@ -2,3 +2,5 @@
 .env
 # Ignore logs
 *.log
+# ingnore db
+app.db
