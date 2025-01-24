@@ -61,7 +61,7 @@ func main() {
 	mqttClient := mqtt.NewClient("tcp://localhost:1883", strconv.FormatInt(client.ID, 10))
 
 	// Subscribe to a topic in a goroutine
-	go mqttClient.Subscribe("test/topic", client.ClientName)
+	go mqttClient.Subscribe("test/topic")
 
 	// Input to deliver message
 	fmt.Println("Type your messages below. Press Ctrl+C to exit.")

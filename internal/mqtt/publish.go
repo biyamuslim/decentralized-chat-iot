@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -31,16 +32,35 @@ func EncryptMessage(key, message string) (string, error) {
 }
 
 func (c *Client) Publish(topic, message string) {
-	// fmt.Printf("Publishing to topic: '%s'\n", topic)
 	token := c.mqttClient.Publish(topic, 0, false, message)
 	token.Wait()
-	// fmt.Println("Published message:", message)
 }
 
 func (c *Client) PublishAndSave(clientRepo *ClientRepository, messageRepo *MessageRepository, clientID int64, topic, message string) {
+	encryptionKey := os.Getenv("ENCRYPTION_KEY")
 
-	encryptionKey := os.Getenv("ENCRYPTION_KEY") //encryption key
-	encryptedMessage, err := EncryptMessage(encryptionKey, message)
+	// Get the sender's client name
+	client, err := clientRepo.GetByUserID(clientID)
+	if err != nil {
+		fmt.Println("Error retrieving client details:", err)
+		return
+	}
+
+	// Create a structured message
+	payload := MessagePayload{
+		ClientName: client.ClientName,
+		Message:    message,
+	}
+
+	// Convert to JSON
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		fmt.Println("Error encoding message:", err)
+		return
+	}
+
+	// Encrypt the JSON message
+	encryptedMessage, err := EncryptMessage(encryptionKey, string(jsonPayload))
 	if err != nil {
 		fmt.Println("Error encrypting message:", err)
 		return
