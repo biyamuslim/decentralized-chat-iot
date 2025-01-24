@@ -1,6 +1,6 @@
 # Decentralized Chat System for IoT
 
-A decentralized chat system leveraging MQTT, built using Go, designed for IoT applications.
+A decentralized chat system leveraging MQTT was built using Go and designed for IoT applications.
 
 ## Table of Contents
 - [Getting Started](#getting-started)
@@ -9,6 +9,7 @@ A decentralized chat system leveraging MQTT, built using Go, designed for IoT ap
 - [Configuration](#configuration)
 - [Running the Application](#running-the-application)
 - [Usage](#usage)
+- [Test Cases](#test-cases)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -84,6 +85,14 @@ ENCRYPTION_KEY="your-32-byte-secret-key-for-aes!"
 - **Register a Client**: Each terminal represents a client. Register using the "Register" option.
 - **Login**: Use the login option to reconnect an existing client.
 - **Broadcast Messages**: Any message sent from one terminal will appear in all other terminals.
+
+## Test Cases
+
+Run the following test cases to verify the functionality:
+```bash
+go test -v ./internal/config
+go test -v ./internal/mqtt
+```
 
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
