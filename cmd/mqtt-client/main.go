@@ -84,6 +84,8 @@ func main() {
 	select {}
 }
 
+// Method to handle Login
+
 func handleLogin(userRepo *mqtt.UserRepository) *mqtt.User {
 	fmt.Print("Enter username: ")
 	var username string
@@ -119,7 +121,7 @@ func handleRegistration(userRepo *mqtt.UserRepository, clientRepo *mqtt.ClientRe
 		return nil
 	}
 
-	// Get the user ID of the newly registered user
+	// Get the user Object of the newly registered user
 	user, err := userRepo.Authenticate(username, password)
 	if err != nil {
 		fmt.Println("Registration error. Please try again.")
